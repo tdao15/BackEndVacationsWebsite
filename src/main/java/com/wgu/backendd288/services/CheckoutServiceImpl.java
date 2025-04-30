@@ -49,8 +49,13 @@ public class CheckoutServiceImpl implements CheckoutService{
         customer.add(cart);
 
         //customerRepository.save(customer);
-
-        return new PurchaseResponse(orderTrackingNumber);
+        if (cart == null || cartItems == null){
+            orderTrackingNumber = "Error: Cart must have at least one item to purchase";
+            return new PurchaseResponse(orderTrackingNumber);
+        }
+        else {
+            return new PurchaseResponse(orderTrackingNumber);
+        }
     }
 
     private String generateOrderTrackingNumber() {
