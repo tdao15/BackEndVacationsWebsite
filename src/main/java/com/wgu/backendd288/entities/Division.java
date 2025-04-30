@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name="divisions")
@@ -42,6 +43,25 @@ public class Division {
     public void setCountry(Country country){
         this.setCountry_id(country.getId());
         this.country = country;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+
+        if (this == object){
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()){
+            return false;
+        }
+
+        Division tempDivision = (Division) object;
+        return Objects.equals(id, tempDivision.id);
+    }
+
+    @Override
+    public int hashCode(){
+        return id != null ? id.hashCode() : 0;
     }
 
 }

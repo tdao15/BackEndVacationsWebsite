@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -35,5 +36,24 @@ public class Country {
 
     @OneToMany(mappedBy="country")
     private Set<Division> divisions;
+
+    @Override
+    public boolean equals(Object object) {
+
+        if (this == object){
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()){
+            return false;
+        }
+
+        Country tempCountry = (Country) object;
+        return Objects.equals(id, tempCountry.id);
+    }
+
+    @Override
+    public int hashCode(){
+        return id != null ? id.hashCode() : 0;
+    }
 
 }

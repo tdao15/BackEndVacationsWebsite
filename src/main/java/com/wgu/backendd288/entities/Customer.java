@@ -1,12 +1,15 @@
 package com.wgu.backendd288.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -14,6 +17,7 @@ import java.util.Set;
 @Data
 @Getter
 @Setter
+@ToString(exclude = "carts")
 public class Customer {
 
     @Id
@@ -46,7 +50,8 @@ public class Customer {
     @JoinColumn(name="division_id")
     private Division division;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="customer")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy="customer", fetch = FetchType.EAGER)
+    @JsonIgnore
     private Set<Cart> carts;
 
     public void add(Cart tempCart){
@@ -60,6 +65,25 @@ public class Customer {
             carts.add(tempCart);
             tempCart.setCustomer(this);
         }
+    }
+
+    @Override
+    public boolean equals(Object object) {
+
+        if (this == object){
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()){
+            return false;
+        }
+
+        Customer tempCustomer = (Customer) object;
+        return Objects.equals(id, tempCustomer.id);
+    }
+
+    @Override
+    public int hashCode(){
+        return id != null ? id.hashCode() : 0;
     }
 
 }

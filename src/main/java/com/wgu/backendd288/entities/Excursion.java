@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -46,5 +47,24 @@ public class Excursion {
 
     @ManyToMany(mappedBy="excursions")
     private Set<CartItem> cartItems;
+
+    @Override
+    public boolean equals(Object object) {
+
+        if (this == object){
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()){
+            return false;
+        }
+
+        Excursion tempExcursion = (Excursion) object;
+        return Objects.equals(id, tempExcursion.id);
+    }
+
+    @Override
+    public int hashCode(){
+        return id != null ? id.hashCode() : 0;
+    }
 
 }

@@ -8,8 +8,10 @@ import com.wgu.backendd288.entities.CartItem;
 import com.wgu.backendd288.entities.Customer;
 import com.wgu.backendd288.entities.StatusType;
 import jakarta.transaction.Transactional;
+import org.hibernate.StaleObjectStateException;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -40,22 +42,32 @@ public class CheckoutServiceImpl implements CheckoutService{
         cart.setOrderTrackingNumber(orderTrackingNumber);
 
         Set<CartItem> cartItems = purchase.getCartItems();
-        cartItems.forEach(item -> cart.add(item));
+
+        if (cartItems != null && !cartItems.isEmpty()){
+            Set<CartItem> cartItemsTarget = new HashSet<>();
+            for (CartItem item : cartItems){
+                item.setCart(cart);
+                cartItemsTarget.add(item);
+            }
+            cart.setCartItem(cartItemsTarget);
+        }
+
+
         cart.setStatus(StatusType.ordered);
 
-        cartRepository.save(cart);
-
-        Customer customer = purchase.getCustomer();
-        customer.add(cart);
-
-        //customerRepository.save(customer);
-        if (cart == null || cartItems == null){
+        if (cart == null || cart.getCartItem() == null){
             orderTrackingNumber = "Error: Cart must have at least one item to purchase";
             return new PurchaseResponse(orderTrackingNumber);
         }
-        else {
-            return new PurchaseResponse(orderTrackingNumber);
-        }
+
+        cartRepository.save(cart);
+
+        //Customer customer = purchase.getCustomer();
+        //customer.add(cart);
+
+        //customerRepository.save(customer);
+        //breakpoint
+        return new PurchaseResponse(orderTrackingNumber);
     }
 
     private String generateOrderTrackingNumber() {

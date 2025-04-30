@@ -1,10 +1,12 @@
 package com.wgu.backendd288.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.DatabindException;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -13,6 +15,7 @@ import com.wgu.backendd288.entities.CartItem;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -20,6 +23,7 @@ import java.util.Set;
 @Data
 @Getter
 @Setter
+@ToString(exclude = {"cartItem", "customer"})
 public class Cart {
 
     @Id
@@ -27,19 +31,18 @@ public class Cart {
     @Column(name="cart_id")
     private Long id;
 
+    @Column(name="order_tracking_number")
+    private String orderTrackingNumber;
+
     @Column(name="package_price")
     private BigDecimal package_price;
 
-    @Column(name="order_tracking_number")
-    private String orderTrackingNumber;
+    @Column(name="party_size")
+    private int party_size;
 
     @Enumerated(EnumType.STRING)
     @Column(name="status")
     private StatusType status;
-
-
-    @Column(name="party_size")
-    private int party_size;
 
     @CreationTimestamp
     @Column(name="create_date")
@@ -53,8 +56,9 @@ public class Cart {
     @JoinColumn(name="customer_id")
     private Customer customer;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="cart")
-    private Set<CartItem> cartItem = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="cart", fetch = FetchType.EAGER)
+    @JsonIgnore
+    private Set<CartItem> cartItem;
 
     public void add(CartItem tempItem){
 
@@ -69,6 +73,25 @@ public class Cart {
 
         }
 
+    }
+
+    @Override
+    public boolean equals(Object object) {
+
+        if (this == object){
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()){
+            return false;
+        }
+
+        Cart tempCart = (Cart) object;
+        return Objects.equals(id, tempCart.id);
+    }
+
+    @Override
+    public int hashCode(){
+        return id != null ? id.hashCode() : 0;
     }
 
 }
