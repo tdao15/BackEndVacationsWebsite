@@ -45,6 +45,9 @@ public class Division {
         this.country = country;
     }
 
+    public Division(){
+    }
+
     @Override
     public boolean equals(Object object) {
 
